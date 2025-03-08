@@ -1,27 +1,87 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "../lib/Firebase";
 import { IoMdSearch } from "react-icons/io";
+import { ChatContext } from "../context/ChatContext";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Addusers = () => {
+  const { userData, chatsdata } = useContext(ChatContext);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate()
 
-   const inputHandler = async (e) => {
-      try {
-        const input = e.target.value;
-        const userRef = collection(db, "users");
-  
-        const q = query(userRef, where("name", "==", input));
-  
-        const querySnap = await getDocs(q);
-  
-        if (!querySnap.empty) {
-          console.log(querySnap.docs[0].data());
-        }
-      } catch (error) {
-        console.log("error", error);
+  const inputHandler = async (e) => {
+    try {
+      const input = e.target.value.trim(); // Trim spaces
+      if (!input) {
+        setUser(null);
+        return;
       }
-    };
+  
+      const userRef = collection(db, "users");
+      const q = query(userRef, where("name", "==", input));
+      const querySnap = await getDocs(q);
+  
+      if (querySnap.empty) return; // No user found
+  
+      const fetchedUser = querySnap.docs[0].data();
+      
+      if (fetchedUser.id === userData.id) return; // Don't set current user
+  
+      const userExist = chatsdata.some((user) => user.rId === fetchedUser.id);
+  
+      if (!userExist) {
+        setUser(fetchedUser);
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+  
+
+  const addChat = async () => {
+    const messageRef = collection(db, "messages");
+    const chatsRef = collection(db, "chats");
+  
+    try {
+      const newMessageRef = doc(messageRef);
+  
+      await setDoc(newMessageRef, {
+        createAt: serverTimestamp(),
+        message: []
+      });
+  
+      // Ensure the chat document exists before updating
+      await setDoc(doc(chatsRef, user.id), {
+        chatsData: arrayUnion({
+          message: newMessageRef.id,
+          lastMessage: "",
+          rId: userData.id,
+          updateAt: Date.now(),
+          messageSeen: true
+        })
+      }, { merge: true });
+  
+      await setDoc(doc(chatsRef, userData.id), {
+        chatsData: arrayUnion({
+          message: newMessageRef.id,
+          lastMessage: "",
+          rId: user.id,
+          updateAt: Date.now(),
+          messageSeen: true
+        })
+      }, { merge: true });
+
+      navigate('/')
+  
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+  
 
   return (
     <div className="lg:w-[97vw] lg:h-[95vh] w-full h-full bg-[#202C33] lg:rounded-xl flex overflow-hidden">
@@ -42,15 +102,30 @@ const Addusers = () => {
           </div>
         </div>
         <div className="mt-6 h-[80vh] w-full flex flex-col overflow-scroll overflow-x-hidden">
-          <div className="w-full h-[70px] border-b-2 border-[#222D34] flex items-center pr-1 gap-4 mb-2 py-2 cursor-pointer">
-            <div className=" w-[60px] h-[50px] border rounded-full"></div>
+          {
+            user
+            ?
+            <div className="w-full h-[70px] border-b-2 border-[#222D34] flex items-center pr-1 gap-4 mb-2 py-2 cursor-pointer">
+            <div className=" w-[60px] h-[50px] border rounded-full overflow-hidden">
+              <img
+                className="w-full h-full"
+                src="https://ik.imagekit.io/0ao6bbymi/profile.jpeg?updatedAt=1735293505376"
+                alt=""
+              />
+            </div>
             <div className="w-full flex flex-col">
               <div className="w-full h-[25px] flex justify-between items-center">
-                <h3 className="text-[20px]">Username</h3>
-                <button className="px-2 py-1 rounded-xl text-xs bg-[#008069] text-white">Add User</button>
+                <h3 className="text-[20px]">{user?.name}</h3>
+                <button onClick={addChat} className="px-2 py-1 rounded-xl text-xs bg-[#008069] text-white">
+                  Add User
+                </button>
               </div>
             </div>
           </div>
+          :
+          <h1 className=" text-center">Add new Friend</h1>
+          }
+          
         </div>
       </div>
     </div>

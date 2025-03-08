@@ -10,6 +10,7 @@ import {toast} from 'react-toastify'
 const Profile = () => {
   const { userData } = useContext(ChatContext);
 
+
   const [editName, setEditName] = useState(false);
   const [editAbout, setEditAbout] = useState(false);
 

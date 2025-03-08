@@ -8,12 +8,11 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../lib/Firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { ChatContext } from "../context/ChatContext";
+import Loading from "../components/Loading";
+import { CiLock, CiUnlock } from "react-icons/ci";
 
 const Login = () => {
-
+  const [password, setPassword] = useState(true);
   const [currentState, setCurrentState] = useState("Login");
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState({
@@ -41,15 +40,15 @@ const Login = () => {
           const res = await createUserWithEmailAndPassword(
             auth,
             email,
-            password
+            password,
           );
 
           await setDoc(doc(db, "users", res.user.uid), {
             id: res.user.uid,
-            name : name.toLowerCase(),
+            name: name.toLowerCase(),
             email,
             about: "Hey, There i am using chat app",
-            lastSeen : Date.now(),
+            lastSeen: Date.now(),
             blocked: [],
           });
           await setDoc(doc(db, "userchats", res.user.uid), {
@@ -64,7 +63,7 @@ const Login = () => {
           toast.success("Account create! You can chat now!");
         } catch (error) {
           console.log(error);
-          toast.error(error.code.split('/')[1].split('-').join(" "));
+          toast.error(error.code.split("/")[1].split("-").join(" "));
         }
       } else {
         const formData = new FormData(e.target);
@@ -82,17 +81,16 @@ const Login = () => {
           toast.success(`Welcome back`);
         } catch (error) {
           console.log(error);
-          toast.error(error.code.split('/')[1].split('-').join(" "));
+          toast.error(error.code.split("/")[1].split("-").join(" "));
         }
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.code.split('/')[1].split('-').join(" "));
+      toast.error(error.code.split("/")[1].split("-").join(" "));
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="w-full h-[calc(100vh)] bg-[#FCF5EB] overflow-hidden">
@@ -131,9 +129,6 @@ const Login = () => {
                   className=""
                   onChange={handleAvatr}
                 />
-                {/* <div className="w-[100px] h-[100px] overflow-hidden rounded-full bg-black">
-
-                </div> */}
               </div>
               <input
                 type="text"
@@ -152,15 +147,21 @@ const Login = () => {
             required
             name="email"
           />
-          <input
-            type="password"
-            className="w-full px-3 py-3 border border-gray-800 rounded-full"
-            placeholder="Password"
-            required
-            name="password"
-          />
-          <div className="w-full flex justify-between text-sm mt-[-8px]">
-            <p className=" cursor-pointer">Forgot your password?</p>
+          <div className="w-full px-3 py-3 border bg-[#FFFFFF] border-gray-800 rounded-full flex items-center justify-between">
+            <input
+              type={password ? "password" : "text"}
+              className="flex-1 bg-transparent outline-none border-none"
+              placeholder="Password"
+              required
+              name="password"
+            />
+            <div className="text-xl cursor-pointer">
+              {password ? <CiLock onClick={()=>setPassword(false)} /> : <CiUnlock onClick={()=>setPassword(true)} />}
+            </div>
+          </div>
+
+          <div className="w-full flex justify-end text-sm mt-[-8px]">
+      
             {currentState === "Login" ? (
               <p
                 onClick={() => setCurrentState("Sign Up")}
@@ -178,16 +179,20 @@ const Login = () => {
             )}
           </div>
           <button
-            className="bg-[#008069] rounded-full text-white font-light px-8 py-2 mt-4 disabled:cursor-not-allowed "
+            className="bg-[#008069] rounded-full text-white font-light px-8 py-2 mt-4 disabled:cursor-not-allowed flex items-center justify-center"
             disabled={loading}
           >
-            {currentState === "Login"
-              ? loading
-                ? "Loading.."
-                : "Sign in"
-              : loading
-              ? "Loading..."
-              : "Sign up"}
+            {currentState === "Login" ? (
+              loading ? (
+                <Loading />
+              ) : (
+                "Sign in"
+              )
+            ) : loading ? (
+              <Loading />
+            ) : (
+              "Sign up"
+            )}
           </button>
         </form>
       </div>

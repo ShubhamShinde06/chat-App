@@ -26,12 +26,12 @@ const Sidebar = () => {
         >
           <IoMdAdd/>
         </NavLink>
-        <NavLink
+        {/* <NavLink
           to={"/video"}
           className=" cursor-pointer flex items-center justify-center pt-1 navlink"
         >
           <IoIosVideocam/>
-        </NavLink>
+        </NavLink> */}
       </div>
 
       <div className="flex flex-col gap-6 text-[25px]">

@@ -8,17 +8,24 @@ const ChatContextProvider = (props) => {
 
     const [chatopen, setChatOpen] = useState(false)
     const [details, setDetails] = useState(false)
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [user, setUser] = useState(null);
     const [userData, setUserData] = useState(null)
     const [chatsdata, setChatsData] = useState(null)
+    const [oppId, setOppId] = useState(null)
+
+    const [messageId, setMessageId] = useState(null)
+    const [message, setMessage] = useState([])
+    const [chatUser, setChatUser] = useState(null)
 
     const loadUserData = async (uid) => {
+        setIsLoading(true)
         try {
             const userRef = doc(db,'users',uid)
             const userSnap = await getDoc(userRef)
             const userData = userSnap.data()
             setUserData(userData)
-
+            setIsLoading(false)
             await updateDoc(userRef,{
                 lastSeen:Date.now()
             })
@@ -31,31 +38,42 @@ const ChatContextProvider = (props) => {
             },60000)
         } catch (error) {
             console.log(error)
+            setIsLoading(false)
         }
     }
 
-    useEffect(()=>{
-        if(userData){
-            const chatRef = doc(db,'userchats',userData.id)
-            const unSub = onSnapshot(chatRef,async (res) =>{
-                const chatItems = res.data().chats
-                const tempDate = []
-                for(const item of chatItems){
-                    const userRef = doc(db, 'users', item.rId)
-                    const userSnap = await getDoc(userRef)
-                    const userData = userSnap.data()
+    useEffect(() => {
+        setIsLoading(true);
+        
+        if (userData) {
+            const chatRef = doc(db, 'chats', userData.id);
+            const unSub = onSnapshot(chatRef, async (res) => {
+                const chatItems = res.data()?.chatsData || [];
+                const tempDate = [];
+    
+                for (const item of chatItems) {
+                    const userRef = doc(db, 'users', item.rId);
+                    const userSnap = await getDoc(userRef);
+                    const userData = userSnap.data();
                     tempDate.push({
                         ...item,
                         userData
-                    })
+                    });
                 }
-                setChatsData(tempDate.sort((a,b)=> b.updatedAt - a.updatedAt))
-                return () => {
-                    unSub()
-                }
-            }) 
+    
+                setChatsData(tempDate.sort((a, b) => b.updatedAt - a.updatedAt));
+                setIsLoading(false);
+            });
+    
+            return () => {
+                unSub();
+                setIsLoading(false); // Cleanup loading state
+            };
+        } else {
+            setIsLoading(false); // If no userData, stop loading
         }
-    },[userData])
+    }, [userData]);
+    
     
     const value = {
         chatopen, 
@@ -66,7 +84,19 @@ const ChatContextProvider = (props) => {
         setUserData,
         chatsdata, 
         setChatsData,
-        loadUserData
+        loadUserData,
+        isLoading, 
+        setIsLoading,
+        user, 
+        setUser,
+
+        messageId, 
+        setMessageId,
+        message, 
+        setMessage,
+        chatUser, 
+        setChatUser,
+        oppId, setOppId
     }
 
     return (

@@ -7,8 +7,10 @@ import { IoIosArrowDropdown } from "react-icons/io";
 import { IoIosArrowDropup } from "react-icons/io";
 
 const Details = () => {
-  const { details, setDetails } = useContext(ChatContext);
+  const { details, setDetails, chatUser } = useContext(ChatContext);
   const [openmedia, setOPenMedia] = useState(false);
+
+  console.log(chatUser)
 
   return (
     <div
@@ -38,12 +40,12 @@ const Details = () => {
               alt=""
             />
           </div>
-          <h3 className="text-[20px]">Username</h3>
+          <h3 className="text-[20px]">{chatUser.userData.name}</h3>
         </div>
       </div>
       <div className="bg-[#111B21] p-3 py-5 mb-3">
         <h1 className="text-[16px] mb-2">About</h1>
-        <h2 className="text-white text-[18px]">Available</h2>
+        <h2 className="text-white text-[18px]">{chatUser.userData.about}</h2>
       </div>
       <div className="bg-[#111B21] p-3 py-5 flex items-center justify-between">
         <h1 className="text-[16px] mb-2">Media, links and docs</h1>

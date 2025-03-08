@@ -1,9 +1,12 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
-import React from "react";
+import React, { useContext } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { db } from "../lib/Firebase";
+import { ChatContext } from "../context/ChatContext";
 
 const Search = () => {
+  const { chatopen, userData, chatsdata, setUser } = useContext(ChatContext);
+
   const inputHandler = async (e) => {
     try {
       const input = e.target.value;
@@ -14,8 +17,9 @@ const Search = () => {
 
       const querySnap = await getDocs(q);
 
-      if (!querySnap.empty) {
-        console.log(querySnap.docs[0].data());
+      if (!querySnap.empty && querySnap.docs[0].data().id !== userData.id) {
+        setUser(querySnap.docs[0].data());
+        //console.log(querySnap.docs[0].data());
       }
     } catch (error) {
       console.log("error", error);
