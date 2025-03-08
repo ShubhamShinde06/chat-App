@@ -162,7 +162,7 @@ const Chat = () => {
             </div>
           </div>
 
-          <div className=" w-full overflow-y-auto px-5 py-5 absolute top-[70px] bottom-[70px]">
+          <div className="bg-img w-full overflow-y-auto px-5 py-5 absolute top-[70px] bottom-[70px]">
             {message.map((msg, index) => (
               <div
                 key={index}
