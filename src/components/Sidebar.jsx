@@ -12,7 +12,7 @@ const Sidebar = () => {
   const {chatopen} = useContext(ChatContext)
 
   return (
-    <div className={`w-[60px] md:w-[60px] lg:w-[80px] h-full flex flex-col justify-between  items-center py-5 text-[#AEBAC1] text-[20px] ${chatopen ? ' hidden md:flex' : ' block'}`}>
+    <div className={`w-[60px] md:w-[60px] lg:w-[80px] h-auto flex flex-col justify-between  items-center py-5 text-[#AEBAC1] text-[20px] ${chatopen ? ' hidden md:flex' : ' block'}`}>
       <div className="flex flex-col gap-6">
         <NavLink
           to={"/"}

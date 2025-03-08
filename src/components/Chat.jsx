@@ -132,7 +132,7 @@ const Chat = () => {
   return (
     <>
       {chatopen && (
-        <div className="block flex-1 overflow-hidden relative">
+        <div className="block flex-1 overflow-hidden relative h-full">
           <div className="w-full h-[70px] bg-[#202C33] px-5 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <IoIosArrowBack
