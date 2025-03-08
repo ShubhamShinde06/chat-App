@@ -1,10 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { FaPhoneAlt } from "react-icons/fa";
-import { IoVideocam } from "react-icons/io5";
-import { FaInfoCircle } from "react-icons/fa";
-import { RiGalleryFill } from "react-icons/ri";
-import { FaCamera } from "react-icons/fa";
-import { FaMicrophone } from "react-icons/fa";
 import { MdEmojiEmotions } from "react-icons/md";
 import { ChatContext } from "../context/ChatContext";
 import { IoIosArrowBack, IoMdAdd } from "react-icons/io";
@@ -15,6 +9,7 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../lib/Firebase";
@@ -125,11 +120,14 @@ const Chat = () => {
     const hour = date.getHours();
     const minute = date.getMinutes();
     if (hour > 12) {
-      return hour - 12 + ":" + minute + "PM";
+      return hour - 12 + ":" + minute + " PM";
     } else {
-      return hour + ":" + minute + "AM";
+      return hour + ":" + minute + " AM";
     }
   };
+
+  
+
 
   return (
     <>
@@ -154,7 +152,7 @@ const Chat = () => {
                 <h3 className="text-[20px] text-white">
                   {chatUser.userData.name}
                 </h3>
-                <h6 className="text-[14px] text-[#7A8D9C]">10:04 pm</h6>
+                <h6 className="text-[14px] text-[#7A8D9C]"> {chatUser.userData.about}</h6>
               </div>
             </div>
             <div className="flex gap-6 items-center text-white text-[20px]">
@@ -172,12 +170,12 @@ const Chat = () => {
                   msg.sId === userData.id ? "justify-end" : "justify-start"
                 } mb-2 z-10`}
               >
-                <div className="w-6 h-6 border rounded-full mr-1 overflow-hidden">
+                {/* <div className="w-6 h-6 border rounded-full mr-1 overflow-hidden">
                   <img
                     src="https://ik.imagekit.io/0ao6bbymi/profile.jpeg?updatedAt=1735293505376"
                     alt=""
                   />
-                </div>
+                </div> */}
                 <div
                   className={`max-w-[60%] p-3 rounded-lg ${
                     msg.sId === userData.id

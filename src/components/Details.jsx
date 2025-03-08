@@ -10,7 +10,6 @@ const Details = () => {
   const { details, setDetails, chatUser } = useContext(ChatContext);
   const [openmedia, setOPenMedia] = useState(false);
 
-  console.log(chatUser)
 
   return (
     <div

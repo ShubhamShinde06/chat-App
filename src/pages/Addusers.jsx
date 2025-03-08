@@ -6,9 +6,10 @@ import { IoMdSearch } from "react-icons/io";
 import { ChatContext } from "../context/ChatContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Loading from '../components/Loading'
 
 const Addusers = () => {
-  const { userData, chatsdata } = useContext(ChatContext);
+  const { userData, chatsdata, isLoading, setIsLoading } = useContext(ChatContext);
   const [user, setUser] = useState(null);
   const navigate = useNavigate()
 
@@ -44,7 +45,7 @@ const Addusers = () => {
   const addChat = async () => {
     const messageRef = collection(db, "messages");
     const chatsRef = collection(db, "chats");
-  
+    setIsLoading(true)
     try {
       const newMessageRef = doc(messageRef);
   
@@ -74,11 +75,13 @@ const Addusers = () => {
         })
       }, { merge: true });
 
+      setIsLoading(false)
       navigate('/')
   
     } catch (error) {
       toast.error(error.message);
       console.log(error);
+      setIsLoading(false)
     }
   };
   
@@ -117,7 +120,7 @@ const Addusers = () => {
               <div className="w-full h-[25px] flex justify-between items-center">
                 <h3 className="text-[20px]">{user?.name}</h3>
                 <button onClick={addChat} className="px-2 py-1 rounded-xl text-xs bg-[#008069] text-white">
-                  Add User
+                  {isLoading ? <Loading/> : 'Add User'}
                 </button>
               </div>
             </div>
